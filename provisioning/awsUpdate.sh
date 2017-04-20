@@ -5,6 +5,6 @@
 
 ./build.sh
 
-aws lambda update-function-code \
+aws-vault -- acl-playground lambda update-function-code \
   --function-name "$1" \
   --zip-file fileb://$(pwd)/dist/lambda.zip

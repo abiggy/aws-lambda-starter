@@ -6,9 +6,9 @@
   "main": "lambda.js",
   "scripts": {
     "build": "./build.sh",
-    "create": "./provisioning/awsCreate.sh myLambda",
-    "deploy": "./provisioning/awsUpdate.sh myLambda",
-    "invoke": "./provisioning/awsInvoke.sh myLambda",
+    "create": "./provisioning/awsCreate.sh foosbot",
+    "deploy": "./provisioning/awsUpdate.sh foosbot",
+    "invoke": "./provisioning/awsInvoke.sh foosbot",
     "localInvoke": "node ./provisioning/localInvoke.js",
     "test": "jasmine",
     "test:watch": "watch jasmine ./"
