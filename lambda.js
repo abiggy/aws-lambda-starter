@@ -20,7 +20,7 @@ var httpSender = {
     var options = {
       port: 443,
       host: 'hooks.slack.com',
-      path: '/services/T52JDC3HU/B51JP3TRP/xzfVeMm1CIwA6OSb3fWEybiH',
+      path: '/services/T02SWPEUM/B51M0G87J/mrdotF9EKOhJjlKNTxdWEJzh',
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -35,20 +35,55 @@ var httpSender = {
   }
 }
 
-// Example lib file that gets bundled with your Lambda.
-const channel = '#general';
-const user = {
-  name: 'foosbot',
-  icon: ':soccer:',
-};
-
-slack = {
+var slack = {
   formatMessage: function(message) {
+    var numberOfPlayer = 3;
+    var numberStr;
+
+    switch (numberOfPlayer) {
+      case 1:
+        numberStr = 'one player';
+        break;
+      case 2:
+        numberStr = 'two players';
+        break;
+      case 3:
+      default:
+        numberStr = 'three players';
+        break;
+    }
+
+    let actions = [];
+
+    for (let k = 1; k <= numberOfPlayer; k++) {
+      if (k > 3) {
+        break;
+      }
+
+      actions.push({
+        name: 'player' + k,
+        text: 'Player ' + k,
+        type: 'button',
+        value: null,
+      });
+    }
+
     var payloadData = {
-      channel: channel,
-      username: user.name,
-      icon_emoji: user.icon,
-      text: message,
+      attachments: [
+        {
+          text: '*Foosball?*',
+          mrkdwn_in: ['text', 'pretext'],
+          color: '#053B79',
+        },
+        {
+          text: 'Need ' + numberStr + '.',
+          callback_id: 'foos_game',
+          color: '#CE0342',
+          attachment_type: 'default',
+          thumb_url: 'https://emoji.slack-edge.com/T02SWPEUM/foosball/23aac20844b52526.jpg',
+          actions: actions,
+        }
+      ]
     };
 
     return payloadData;
