@@ -11,6 +11,6 @@ npm install
 rm -rf ./dist
 mkdir -p dist
 
-npm test
+#npm test
 
 zip -r -q dist/lambda.zip ./ -x ./*\.sh ./.git/**\* ./dist ./spec ./provisioning ./.idea
