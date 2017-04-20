@@ -1,7 +1,7 @@
 var http = require('http');
 
-var httpSender = require('lib/httpSender.js')
-var slack = require('lib/slack.js')
+var httpSender = require('./lib/httpSender.js')
+var slack = require('./lib/slack.js')
 
 // config containing our slash command api token
 var config = require('./config.json');
