@@ -8,9 +8,20 @@ var config = require('./config.json');
 
 // Entrypoint for AWS Lambda
 exports.handler = function(event, context) {
-  let message = event.text ? event.text.trim() : null;
+  let type = event.type;
+  let content = event.content ? event.content.trim() : null;
 
-  payloadData = slack.formatMessage(message);
+  switch (type) {
+    case 'players_needed':
+      content = parseInt(content);
+      payloadData = slack.formatPlayersNeeded(content);
+      break;
+
+    case 'message':
+    default:
+      payloadData = slack.formatMessage(content);
+  }
+
   httpSender.send(payloadData);
 };
 
@@ -37,7 +48,17 @@ var httpSender = {
 
 var slack = {
   formatMessage: function(message) {
-    var numberOfPlayer = 3;
+    var payloadData = {
+      channel: channel,
+      username: user.name,
+      icon_emoji: user.icon,
+      text: message,
+    }
+
+    return payloadData;
+  },
+
+  formatPlayersNeeded: function(numberOfPlayer) {
     var numberStr;
 
     switch (numberOfPlayer) {
