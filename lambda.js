@@ -1,5 +1,3 @@
-var http = require('http');
-
 var httpSender = require('./lib/httpSender.js')
 var slack = require('./lib/slack.js')
 
