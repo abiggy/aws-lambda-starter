@@ -18,6 +18,9 @@ exports.handler = function(event, context, callback) {
   }
 
   switch (type) {
+    case 'slash_players_needed':
+      content = content.split('&')[8].split('=')[1];
+
     case 'players_needed':
       console.log('player_needed');
       content = parseInt(content);
