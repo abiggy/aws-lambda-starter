@@ -139,9 +139,9 @@ var slack = {
 
     var numberOfPlayer = 0;
 
-    if (originalMessage.attachments[1].text.indexOf('two')) {
+    if (originalMessage.attachments[1].text.indexOf('two') !== -1) {
       numberOfPlayer = 1;
-    } else if (originalMessage.attachments[1].text.indexOf('three')) {
+    } else if (originalMessage.attachments[1].text.indexOf('three') !== -1) {
       numberOfPlayer = 2;
     }
 
@@ -153,6 +153,11 @@ var slack = {
     originalMessage.attachments[1].text = numberOfPlayerString;
     originalMessage.attachments[1].actions = slack.getActions(numberOfPlayer);
 
+    for (var k = 2; k < originalMessage.attachments.length; k++) {
+      originalMessage.attachments[k].text =
+        originalMessage.attachments[k].text.split('+').join(' ');
+    }
+
     originalMessage.attachments.push({
       text: '*_' + userJoined + '_* has joined the game.',
       mrkdwn_in: ['text'],
@@ -161,5 +166,4 @@ var slack = {
 
     return originalMessage;
   },
-
 };
