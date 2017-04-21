@@ -116,10 +116,12 @@ var slack = {
     return payloadData;
   },
 
-  playerJoinedHandler: function (payload) {
-    var user = payload.user.name;
-    var player = payload.actions.value;
-    var payloadResponse = payload.original_message;
+  playerJoinedHandler: function (rawPayload) {
+    var stringResponse = decodeURIComponent(rawPayload);
+    var payloadJson = JSON.parse(stringResponse);
+    var user = payloadJson.user.name;
+    var player = payloadJson.actions.value;
+    var payloadResponse = payloadJson.original_message;
     var payloadActions = payloadResponse.attachments;
 
     for (p of payloadActions) {
