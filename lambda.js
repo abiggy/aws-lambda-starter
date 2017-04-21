@@ -124,7 +124,10 @@ var slack = {
     switch (parseInt(numberOfPlayer)) {
       case 1: return 'one player';
       case 2: return 'two players';
-      case 3: return 'three players';
+      case 3:
+      default:
+        return 'three players';
+
     }
   },
 
