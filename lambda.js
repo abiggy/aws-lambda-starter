@@ -11,6 +11,11 @@ exports.handler = function(event, context) {
   let type = event.type;
   let content = event.content;
 
+  if (event.payload) {
+    type = 'player_joined';
+    content = event.payload;
+  }
+
   switch (type) {
     case 'players_needed':
       content = parseInt(content);
