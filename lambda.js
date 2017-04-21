@@ -8,7 +8,7 @@ var request = require('request');
 var config = require('./config.json');
 
 // Entrypoint for AWS Lambda
-exports.handler = function(event, context) {
+exports.handler = function(event, context, callback) {
   let type = event.type;
   let content = event.content;
 
@@ -19,24 +19,29 @@ exports.handler = function(event, context) {
 
   switch (type) {
     case 'players_needed':
+      console.log('player_needed');
       content = parseInt(content);
       payloadData = slack.formatPlayersNeeded(content);
       break;
 
     case 'player_joined':
-      context.status(200).end();
+      console.log('player_joined');
+      //context.status(200).end();
       let contentString = decodeURIComponent(content);
-      let contentJson = JSON.parse(stringResponse);
+      let contentJson = JSON.parse(contentString);
 
-      let message = slack.playerJoinedResponseMessage(content);
-      let responseURL = slack.getResponseURL(content);
+      let message = slack.playerJoinedResponseMessage(contentJson);
+      let responseURL = slack.getResponseURL(contentJson);
 
+      callback(null, message);
+      return;
       slack.sendMessageToSlackResponseURL(responseURL, message);
       return;
 
     case 'message':
     default:
-      payloadData = slack.formatMessage(content, event.id);
+      console.log('message');
+      payloadData = slack.formatMessage(content, event.timestamp);
   }
 
   httpSender.send(payloadData);
@@ -124,7 +129,8 @@ var slack = {
     return payloadData;
   },
 
-  playerJoinedHandler: function (payload) {
+  playerJoinedResponseMessage: function (payload) {
+    console.log('playerJoinedResponseMessage');
     var user = payload.user.name;
     var player = payload.actions.value;
     var payloadResponse = payload.original_message;
