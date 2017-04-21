@@ -17,6 +17,10 @@ exports.handler = function(event, context) {
       payloadData = slack.formatPlayersNeeded(content);
       break;
 
+    case 'player_joined':
+      payloadData = slack.playerJoinedHandler(content);
+      return payloadData;
+
     case 'message':
     default:
       payloadData = slack.formatMessage(content);
@@ -43,7 +47,7 @@ var httpSender = {
 
     req.write(payload);
     req.end();
-  }
+  },
 }
 
 var slack = {
@@ -82,7 +86,7 @@ var slack = {
         name: 'player' + k,
         text: 'Player ' + k,
         type: 'button',
-        value: null,
+        value: 'player' + k,
       });
     }
 
@@ -105,5 +109,60 @@ var slack = {
     };
 
     return payloadData;
-  }
+  },
+
+  playerJoinedHandler: function (payload) {
+    var user = payload.user.name;
+    var player = payload.actions.value;
+    var payloadResponse = payload.original_message;
+    var payloadActions = payloadResponse.attachments;
+
+    for (p of payloadActions) {
+      if (p.actions) {
+        for (a of p.actions) {
+          if (a.value === player) {
+            a.name = 'player' + k,
+            a.text = user;
+            a.type = 'text';
+            break;
+          }
+        }
+      }
+    }
+
+    payloadResponse.attachments = payloadActions;
+
+    return payloadResponse;
+  },
+  /*
+
+  sendMessageBackToSlack: function (responseURL, jsonMessage) {
+    var postOptions = {
+      uri: responseURL,
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/json'
+      },
+      json: JSONmessage
+    };
+
+    var payload = 'payload=' + JSON.stringify(payloadData);
+    var options = {
+      port: 443,
+      host: 'hooks.slack.com',
+      path: '/services/T02SWPEUM/B51M0G87J/mrdotF9EKOhJjlKNTxdWEJzh',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Length': payload.length
+      }
+    };
+
+    var req = http.request(options);
+
+    req.write(payload);
+    req.end();
+  },
+  */
+
 };
