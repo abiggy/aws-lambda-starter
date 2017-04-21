@@ -26,18 +26,15 @@ exports.handler = function(event, context, callback) {
 
     case 'player_joined':
       console.log('player_joined');
-      //context.status(200).end();
+
       let contentString = decodeURIComponent(content);
       let contentJson = JSON.parse(contentString);
 
       let message = slack.playerJoinedResponseMessage(contentJson);
-      let responseURL = slack.getResponseURL(contentJson);
 
       console.log('callback message: '+ message);
 
       callback(null, message);
-      return;
-      slack.sendMessageToSlackResponseURL(responseURL, message);
       return;
 
     case 'message':
@@ -160,26 +157,6 @@ var slack = {
     });
 
     return originalMessage;
-  },
-
-  getResponseURL: function (payload) {
-    return payload.response_url;
-  },
-
-  sendMessageToSlackResponseURL: function(responseURL, JSONmessage){
-    var postOptions = {
-      uri: responseURL,
-      method: 'POST',
-      headers: {
-        'Content-type': 'application/json'
-      },
-      json: JSONmessage
-    }
-    request(postOptions, (error, response, body) => {
-      if (error){
-        // handle errors as you see fit
-      }
-    });
   },
 
 };
