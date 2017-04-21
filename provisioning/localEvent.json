@@ -1,4 +1,4 @@
 {
-  "type": "players_needed",
-  "content": "1"
+  "type": "message",
+  "content": "should work"
 }

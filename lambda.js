@@ -49,9 +49,6 @@ var httpSender = {
 var slack = {
   formatMessage: function(message) {
     var payloadData = {
-      channel: channel,
-      username: user.name,
-      icon_emoji: user.icon,
       text: message,
     }
 
