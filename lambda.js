@@ -9,7 +9,7 @@ var config = require('./config.json');
 // Entrypoint for AWS Lambda
 exports.handler = function(event, context) {
   let type = event.type;
-  let content = event.content ? event.content.trim() : null;
+  let content = event.content;
 
   switch (type) {
     case 'players_needed':
