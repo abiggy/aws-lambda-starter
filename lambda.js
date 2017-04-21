@@ -33,6 +33,8 @@ exports.handler = function(event, context, callback) {
       let message = slack.playerJoinedResponseMessage(contentJson);
       let responseURL = slack.getResponseURL(contentJson);
 
+      console.log('callback message: '+ message);
+
       callback(null, message);
       return;
       slack.sendMessageToSlackResponseURL(responseURL, message);
@@ -78,35 +80,9 @@ var slack = {
   },
 
   formatPlayersNeeded: function(numberOfPlayer) {
-    var numberStr;
+    var numberStr = slack.getNumberString(numberOfPlayer);
 
-    switch (numberOfPlayer) {
-      case 1:
-        numberStr = 'one player';
-        break;
-      case 2:
-        numberStr = 'two players';
-        break;
-      case 3:
-      default:
-        numberStr = 'three players';
-        break;
-    }
-
-    let actions = [];
-
-    for (let k = 1; k <= numberOfPlayer; k++) {
-      if (k > 3) {
-        break;
-      }
-
-      actions.push({
-        name: 'player' + k,
-        text: 'Player ' + k,
-        type: 'button',
-        value: 'player' + k,
-      });
-    }
+    let actions = slack.getActions(numberOfPlayer);
 
     var payloadData = {
       attachments: [
@@ -129,28 +105,61 @@ var slack = {
     return payloadData;
   },
 
-  playerJoinedResponseMessage: function (payload) {
-    console.log('playerJoinedResponseMessage');
-    var user = payload.user.name;
-    var player = payload.actions.value;
-    var payloadResponse = payload.original_message;
-    var payloadActions = payloadResponse.attachments;
-
-    for (p of payloadActions) {
-      if (p.actions) {
-        for (a of p.actions) {
-          if (a.value === player) {
-            a.text = user;
-            a.type = 'text';
-            break;
-          }
-        }
+  getActions: function (numberOfPlayer) {
+    var actions = [];
+    for (let k = 1; k <= numberOfPlayer; k++) {
+      if (k > 3) {
+        break;
       }
+
+      actions.push({
+        name: 'player' + k,
+        text: 'Player ' + k,
+        type: 'button',
+        value: 'player' + k,
+      });
     }
 
-    payloadResponse.attachments = payloadActions;
+    return actions;
+  },
 
-    return payloadResponse;
+  getNumberString: function (numberOfPlayer) {
+    switch (parseInt(numberOfPlayer)) {
+      case 1: return 'one player';
+      case 2: return 'two players';
+      case 3: return 'three players';
+    }
+  },
+
+
+  playerJoinedResponseMessage: function (payload) {
+    console.log('playerJoinedResponseMessage');
+    var userJoined = payload.user.name;
+    var originalMessage = payload.original_message;
+
+    var numberOfPlayer = 0;
+
+    if (originalMessage.attachments[1].text.indexOf('two')) {
+      numberOfPlayer = 1;
+    } else if (originalMessage.attachments[1].text.indexOf('three')) {
+      numberOfPlayer = 2;
+    }
+
+    var numberOfPlayerString = "Don't need anymore players!";
+    if (numberOfPlayer) {
+      numberOfPlayerString = "Need " + slack.getNumberString(numberOfPlayer) + '.';
+    }
+
+    originalMessage.attachments[1].text = numberOfPlayerString;
+    originalMessage.attachments[1].actions = slack.getActions(numberOfPlayer);
+
+    originalMessage.attachments.push({
+      text: '*_' + userJoined + '_* has joined the game.',
+      mrkdwn_in: ['text'],
+      color: '#053B79',
+    });
+
+    return originalMessage;
   },
 
   getResponseURL: function (payload) {
