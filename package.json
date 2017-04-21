@@ -15,9 +15,9 @@
   },
   "author": "Ryan Ray <ryan@ryanray.me>",
   "license": "Apache 2.0",
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
-    "proxyquire": "~1.7.2"
+    "proxyquire": "~1.7.2",
+    "request": "^2.81.0"
   }
 }

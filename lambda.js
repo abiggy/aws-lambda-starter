@@ -1,4 +1,5 @@
 var http = require('https');
+var request = require('request');
 
 //var httpSender = require('./lib/httpSender.js')
 //var slack = require('./lib/slack.js')
@@ -23,12 +24,19 @@ exports.handler = function(event, context) {
       break;
 
     case 'player_joined':
-      payloadData = slack.playerJoinedHandler(content);
-      return payloadData;
+      context.status(200).end();
+      let contentString = decodeURIComponent(content);
+      let contentJson = JSON.parse(stringResponse);
+
+      let message = slack.playerJoinedResponseMessage(content);
+      let responseURL = slack.getResponseURL(content);
+
+      slack.sendMessageToSlackResponseURL(responseURL, message);
+      return;
 
     case 'message':
     default:
-      payloadData = slack.formatMessage(content);
+      payloadData = slack.formatMessage(content, event.id);
   }
 
   httpSender.send(payloadData);
@@ -116,19 +124,16 @@ var slack = {
     return payloadData;
   },
 
-  playerJoinedHandler: function (rawPayload) {
-    var stringResponse = decodeURIComponent(rawPayload);
-    var payloadJson = JSON.parse(stringResponse);
-    var user = payloadJson.user.name;
-    var player = payloadJson.actions.value;
-    var payloadResponse = payloadJson.original_message;
+  playerJoinedHandler: function (payload) {
+    var user = payload.user.name;
+    var player = payload.actions.value;
+    var payloadResponse = payload.original_message;
     var payloadActions = payloadResponse.attachments;
 
     for (p of payloadActions) {
       if (p.actions) {
         for (a of p.actions) {
           if (a.value === player) {
-            a.name = 'player' + k,
             a.text = user;
             a.type = 'text';
             break;
@@ -141,9 +146,12 @@ var slack = {
 
     return payloadResponse;
   },
-  /*
 
-  sendMessageBackToSlack: function (responseURL, jsonMessage) {
+  getResponseURL: function (payload) {
+    return payload.response_url;
+  },
+
+  sendMessageToSlackResponseURL: function(responseURL, JSONmessage){
     var postOptions = {
       uri: responseURL,
       method: 'POST',
@@ -151,25 +159,12 @@ var slack = {
         'Content-type': 'application/json'
       },
       json: JSONmessage
-    };
-
-    var payload = 'payload=' + JSON.stringify(payloadData);
-    var options = {
-      port: 443,
-      host: 'hooks.slack.com',
-      path: '/services/T02SWPEUM/B51M0G87J/mrdotF9EKOhJjlKNTxdWEJzh',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Content-Length': payload.length
+    }
+    request(postOptions, (error, response, body) => {
+      if (error){
+        // handle errors as you see fit
       }
-    };
-
-    var req = http.request(options);
-
-    req.write(payload);
-    req.end();
+    });
   },
-  */
 
 };
